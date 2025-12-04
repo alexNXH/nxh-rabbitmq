@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 
 # Appliquer les variables d'environnement custom
 if [[ -n "${NXH_RABBITMQ_DEFAULT_USER:-}" ]] && [[ -n "${NXH_RABBITMQ_DEFAULT_PASS:-}" ]]; then
