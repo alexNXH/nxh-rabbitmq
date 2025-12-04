@@ -1,0 +1,71 @@
+{
+  "users": [
+    {
+      "name": "admin",
+      "password": "SecurePass123!",
+      "tags": "administrator"
+    },
+    {
+      "name": "service",
+      "password": "ServicePass456!",
+      "tags": "monitoring"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    },
+    {
+      "name": "production"
+    },
+    {
+      "name": "staging"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "service",
+      "vhost": "/",
+      "configure": "",
+      "write": "",
+      "read": ".*"
+    }
+  ],
+  "queues": [
+    {
+      "name": "nxh.default.queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "nxh.default.exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "nxh.default.exchange",
+      "vhost": "/",
+      "destination": "nxh.default.queue",
+      "destination_type": "queue",
+      "routing_key": "default",
+      "arguments": {}
+    }
+  ]
+}
