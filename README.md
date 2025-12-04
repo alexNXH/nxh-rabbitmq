@@ -1,8 +1,8 @@
 # NXH RabbitMQ Custom Service
 
-![Docker Build](https://github.com/your-org/nxh-rabbitmq/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)
+![Docker Build](https://github.com/nexah/nxh-rabbitmq/workflows/Build%20and%20Push%20Docker%20Image/badge.svg)
 ![Multi-Arch](https://img.shields.io/badge/architecture-amd64%20%7C%20arm64-success)
-![License](https://img.shields.io/badge/license-MIT-blue)
+<!-- ![License](https://img.shields.io/badge/license-MIT-blue) -->
 
 Service RabbitMQ custom optimisé pour les environnements ARM64 et prêt pour le déploiement Kubernetes.
 
