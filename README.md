@@ -18,7 +18,7 @@ Service RabbitMQ custom optimisé pour les environnements ARM64 et prêt pour le
 - ✅ Sécurité renforcée
 - ✅ Persistence des données
 
-## 🚀 Démarrage Rapide
+## 🚀 Démarrage Rapide.
 
 ### Prérequis
 
