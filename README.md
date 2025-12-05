@@ -26,6 +26,21 @@ Service RabbitMQ custom optimisé pour les environnements ARM64 et prêt pour le
 - Docker Compose 2.0+
 - (Optionnel) Kubernetes 1.24+
 
+## 🔧 Gestion des versions de packages
+
+### Pourquoi nous n'épinglons pas les versions exactes :
+
+1. **Stabilité du build** : Les versions épinglées peuvent devenir indisponibles
+2. **Mises à jour de sécurité** : Recevoir automatiquement les correctifs
+3. **Compatibilité Alpine** : Les packages sont maintenus en cohérence
+
+### Pour épingler des versions spécifiques (si nécessaire) :
+
+1. Vérifier les versions disponibles :
+```bash
+chmod +x scripts/check-alpine-versions.sh
+./scripts/check-alpine-versions.sh
+
 ### 1. Cloner le repository
 
 ```bash
