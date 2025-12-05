@@ -6,7 +6,7 @@
 
 Image Docker RabbitMQ personnalisée et optimisée pour les architectures **ARM64** et **AMD64**, prête pour le déploiement Kubernetes.
 
-## 📋 Table des matières
+## 📋 Table des matières.
 
 - [Caractéristiques](#-caractéristiques)
 - [Prérequis](#-prérequis)
