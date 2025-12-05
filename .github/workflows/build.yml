@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/nxh-rabbitmq
+  DOCKER_IMAGE: nexah/nxh-rabbitmq
   PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
