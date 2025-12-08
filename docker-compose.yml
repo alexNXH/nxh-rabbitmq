@@ -22,7 +22,7 @@ services:
     # Ports exposés
     ports:
       - "5672:5672"   # AMQP protocol
-      - "15672:15672" # Management UI
+      - "443:443" # Management UI
     
     # Volume pour persistance locale (optionnel pour dev)
     volumes:

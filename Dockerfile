@@ -38,7 +38,7 @@ disk_free_limit.absolute = 2GB
 listeners.tcp.default = 5672
 
 ## Management Plugin
-management.tcp.port = 15672
+management.tcp.port = 443
 management.tcp.ip = 0.0.0.0
 
 ## Clustering (désactivé par défaut)
