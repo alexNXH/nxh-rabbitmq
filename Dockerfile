@@ -70,8 +70,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Exposer les ports
 # 5672: AMQP protocol
-# 15672: Management UI
-EXPOSE 5672 15672
+# 443: Management UI
+EXPOSE 5672 443
 
 # Volume pour la persistance
 VOLUME /var/lib/rabbitmq
