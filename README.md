@@ -1,7 +1,7 @@
 # 🐰 NXH RabbitMQ - Custom Docker Image
 
 [![Build Status](https://github.com/alexNXH/nxh-rabbitmq/workflows/Build%20and%20Push%20Multi-Arch%20Docker%20Image/badge.svg)](https://github.com/alexNXH/nxh-rabbitmq/actions)
-[![Docker Pulls](https://img.shields.io/docker/pulls/nexah/nxh-rabbitmq.svg)](https://hub.docker.com/r/nexah/nxh-rabbitmq)
+[![Docker Pulls](https://img.shields.io/docker/pulls/nexah/nxh-rabbitmq.svg)](https://hub.docker.com/r/alexnexah/nxh-rabbitmq)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Image Docker RabbitMQ personnalisée et optimisée pour les architectures **ARM64** et **AMD64**, prête pour le déploiement Kubernetes.
