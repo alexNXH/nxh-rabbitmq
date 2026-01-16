@@ -9,8 +9,8 @@ import sys
 # Configuration
 RABBITMQ_HOST = 'localhost'
 RABBITMQ_PORT = 5672
-RABBITMQ_USER = 'admin'
-RABBITMQ_PASS = 'admin'
+RABBITMQ_USER = 'nxh_admin'
+RABBITMQ_PASS = 'nxh_secure_password_2024'
 
 def test_connection():
     """Test la connexion à RabbitMQ"""
