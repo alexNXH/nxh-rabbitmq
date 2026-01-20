@@ -1,12 +1,12 @@
 # 🐰 NXH RabbitMQ - Custom Docker Image
 
-[![Build Status](https://github.com/alexNXH/nxh-rabbitmq/workflows/Build%20and%20Push%20Multi-Arch%20Docker%20Image/badge.svg)](https://github.com/alexNXH/nxh-rabbitmq/actions)
-[![Docker Pulls](https://img.shields.io/docker/pulls/nexah/nxh-rabbitmq.svg)](https://hub.docker.com/r/alexnexah/nxh-rabbitmq)
+[![Build Status](https://github.com/YOUR_USERNAME/nxh-rabbitmq/workflows/Build%20and%20Push%20Multi-Arch%20Docker%20Image/badge.svg)](https://github.com/YOUR_USERNAME/nxh-rabbitmq/actions)
+[![Docker Pulls](https://img.shields.io/docker/pulls/YOUR_USERNAME/nxh-rabbitmq.svg)](https://hub.docker.com/r/YOUR_USERNAME/nxh-rabbitmq)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Image Docker RabbitMQ personnalisée et optimisée pour les architectures **ARM64** et **AMD64**, prête pour le déploiement Kubernetes.
 
-## 📋 Table des matières.
+## 📋 Table des matières
 
 - [Caractéristiques](#-caractéristiques)
 - [Prérequis](#-prérequis)
@@ -73,14 +73,19 @@ Accédez à l'interface web : **http://localhost:15672**
 
 ## ⚙️ Configuration
 
-### Variables d'environnement
+### Variables d'environnement NXH
 
-| Variable | Description | Défaut |
-|----------|-------------|--------|
-| `NXH_RABBITMQ_DEFAULT_USER` | Nom d'utilisateur admin | `nxh_admin` |
-| `NXH_RABBITMQ_DEFAULT_PASS` | Mot de passe admin | `nxh_secure_password_2024` |
-| `RABBITMQ_VM_MEMORY_HIGH_WATERMARK` | Seuil mémoire (0.6 = 60%) | `0.6` |
-| `RABBITMQ_DISK_FREE_LIMIT` | Espace disque minimum | `2GB` |
+| Variable | Description | Défaut | Requis |
+|----------|-------------|--------|--------|
+| `NXH_RABBITMQ_HOST` | Hostname du serveur | `localhost` | Non |
+| `NXH_RABBITMQ_PORT` | Port AMQP | `5672` | Non |
+| `NXH_RABBITMQ_API_PORT` | Port Management UI | `15672` | Non |
+| `NXH_RABBITMQ_USER` | Utilisateur principal | `nxh_admin` | Oui |
+| `NXH_RABBITMQ_PASSWORD` | Mot de passe principal | `nxh_secure_password_2024` | Oui |
+| `NXH_RABBITMQ_MGMT_USER` | Utilisateur Management | `${NXH_RABBITMQ_USER}` | Non |
+| `NXH_RABBITMQ_MGMT_PASSWORD` | Mot de passe Management | `${NXH_RABBITMQ_PASSWORD}` | Non |
+| `NXH_RABBITMQ_VHOST` | Virtual Host | `/` | Non |
+| `NXH_RABBITMQ_QUEUE` | Queue par défaut | `default_queue` | Non |
 
 ### Override des credentials
 

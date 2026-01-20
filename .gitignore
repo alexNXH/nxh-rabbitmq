@@ -6,7 +6,11 @@ docker-compose.override.yml
 .env
 .env.local
 .env.*.local
-venv/
+
+# Configuration exports
+rabbitmq-config.*
+*.env
+!.env.example
 
 # IDE
 .vscode/

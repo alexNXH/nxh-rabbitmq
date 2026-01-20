@@ -5,15 +5,31 @@
 FROM rabbitmq:3.13-management-alpine AS base
 
 # Metadata
-LABEL maintainer="NXH Admin SYS Team"
-LABEL description="Custom RabbitMQ service with pre-configured defaults"
-LABEL version="1.0.1"
+LABEL maintainer="NXH AdminSys Team"
+LABEL description="Custom RabbitMQ service with advanced configuration"
+LABEL version="1.1.0"
 
-# Variables d'environnement pour les credentials uniquement
-ENV NXH_RABBITMQ_DEFAULT_USER=nxh_admin
-ENV NXH_RABBITMQ_DEFAULT_PASS=nxh_secure_password_2024
-ENV RABBITMQ_DEFAULT_USER=${NXH_RABBITMQ_DEFAULT_USER}
-ENV RABBITMQ_DEFAULT_PASS=${NXH_RABBITMQ_DEFAULT_PASS}
+# Variables d'environnement - Configuration principale
+ENV NXH_RABBITMQ_HOST=localhost
+ENV NXH_RABBITMQ_PORT=5672
+ENV NXH_RABBITMQ_API_PORT=15672
+
+# Variables d'environnement - Credentials utilisateur principal
+ENV NXH_RABBITMQ_USER=nxh_admin
+ENV NXH_RABBITMQ_PASSWORD=nxh_secure_password_2024
+
+# Variables d'environnement - Credentials management (par défaut = user principal)
+ENV NXH_RABBITMQ_MGMT_USER=${NXH_RABBITMQ_USER}
+ENV NXH_RABBITMQ_MGMT_PASSWORD=${NXH_RABBITMQ_PASSWORD}
+
+# Variables d'environnement - VHost et Queue
+ENV NXH_RABBITMQ_VHOST=/
+ENV NXH_RABBITMQ_QUEUE=default_queue
+
+# Mapping vers les variables RabbitMQ standard
+ENV RABBITMQ_DEFAULT_USER=${NXH_RABBITMQ_USER}
+ENV RABBITMQ_DEFAULT_PASS=${NXH_RABBITMQ_PASSWORD}
+ENV RABBITMQ_DEFAULT_VHOST=${NXH_RABBITMQ_VHOST}
 
 # Activer les plugins essentiels
 RUN rabbitmq-plugins enable --offline \
@@ -22,10 +38,14 @@ RUN rabbitmq-plugins enable --offline \
     rabbitmq_shovel \
     rabbitmq_shovel_management
 
+# Copier le script d'initialisation
+COPY docker-entrypoint-init.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint-init.sh
+
 # Créer le fichier de configuration RabbitMQ
 RUN mkdir -p /etc/rabbitmq && \
     cat > /etc/rabbitmq/rabbitmq.conf <<EOF
-# Configuration RabbitMQ optimisée
+# Configuration RabbitMQ NXH
 # https://www.rabbitmq.com/configure.html
 
 ## Memory
@@ -49,10 +69,7 @@ log.console = true
 log.console.level = info
 log.file = false
 
-## Default vhost
-default_vhost = /
-default_user = ${NXH_RABBITMQ_DEFAULT_USER}
-default_pass = ${NXH_RABBITMQ_DEFAULT_PASS}
+## Default permissions
 default_permissions.configure = .*
 default_permissions.read = .*
 default_permissions.write = .*
@@ -69,10 +86,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
         rabbitmq-diagnostics -q check_local_alarms
 
 # Exposer les ports
-# 5672: AMQP protocol
-# 443: Management UI
-EXPOSE 5672
-EXPOSE 15672
+EXPOSE ${NXH_RABBITMQ_PORT} ${NXH_RABBITMQ_API_PORT}
 
 # Volume pour la persistance
 VOLUME /var/lib/rabbitmq
@@ -80,5 +94,6 @@ VOLUME /var/lib/rabbitmq
 # Utiliser l'utilisateur non-root par défaut
 USER rabbitmq
 
-# Point d'entrée par défaut de l'image RabbitMQ
+# Wrapper pour l'entrypoint
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint-init.sh"]
 CMD ["rabbitmq-server"]
