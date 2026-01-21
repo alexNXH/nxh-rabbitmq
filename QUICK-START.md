@@ -1,6 +1,6 @@
-# 🚀 Guide de Démarrage Rapide - Configuration pour Applications
+# Guide de Démarrage Rapide - Configuration pour Applications
 
-## 📋 Variables d'Environnement à Fournir aux Applications
+## Variables d'Environnement à Fournir aux Applications
 
 Voici les variables que vos applications doivent utiliser pour se connecter à RabbitMQ :
 
@@ -25,7 +25,7 @@ NXH_RABBITMQ_MGMT_PASSWORD=nxh_secure_password_2024  # Password UI
 
 ---
 
-## 🔧 Configuration Initiale
+## Configuration Initiale
 
 ### Étape 1 : Créer votre fichier .env
 
@@ -61,13 +61,13 @@ docker-compose up -d
 docker-compose logs -f rabbitmq
 
 # Chercher cette ligne :
-# "✅ Post-start configuration completed"
+# "Post-start configuration completed"
 # "Server startup complete; 7 plugins started."
 ```
 
 ---
 
-## 📤 Exporter la Configuration pour vos Applications
+## Exporter la Configuration pour vos Applications
 
 ### Option 1 : Export JSON (recommandé pour API)
 
@@ -126,7 +126,7 @@ NXH_RABBITMQ_QUEUE=dev_tasks_queue
 
 ---
 
-## 🔗 URLs de Connexion
+## URLs de Connexion
 
 ### URL AMQP (pour applications)
 
@@ -152,7 +152,7 @@ http://localhost:15672
 
 ---
 
-## 💻 Exemples d'Utilisation dans vos Applications
+## Exemples d'Utilisation dans vos Applications
 
 ### Python (avec pika)
 
@@ -254,7 +254,7 @@ services:
 
 ---
 
-## 🌍 Configurations par Environnement
+## Configurations par Environnement
 
 ### Développement
 
@@ -288,7 +288,7 @@ NXH_RABBITMQ_QUEUE=prod_queue
 
 ---
 
-## 🔐 Bonnes Pratiques
+## Bonnes Pratiques
 
 ### 1. Ne jamais commiter les credentials
 
@@ -333,7 +333,7 @@ NXH_RABBITMQ_VHOST=/production
 
 ---
 
-## 🧪 Tester la Configuration
+## Tester la Configuration
 
 ```bash
 # 1. Exporter la config
@@ -353,20 +353,20 @@ creds = pika.PlainCredentials(NXH_RABBITMQ_USER, NXH_RABBITMQ_PASSWORD)
 conn = pika.BlockingConnection(
     pika.ConnectionParameters(NXH_RABBITMQ_HOST, credentials=creds)
 )
-print("✅ Connexion réussie !")
+print("Connexion réussie !")
 conn.close()
 EOF
 ```
 
 ---
 
-## 📚 Prochaines Étapes
+## Prochaines Étapes
 
-1. ✅ Configurer RabbitMQ avec vos variables
-2. ✅ Exporter la configuration
-3. ✅ Intégrer dans vos applications
-4. 📖 Lire la [documentation complète](README.md)
-5. 🚀 Déployer en production
+1. Configurer RabbitMQ avec vos variables
+2. Exporter la configuration
+3. Intégrer dans vos applications
+4. Lire la [documentation complète](README.md)
+5. Déployer en production
 
 ---
 

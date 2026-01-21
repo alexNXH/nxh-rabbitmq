@@ -1,4 +1,4 @@
-# 🐰 NXH RabbitMQ - Custom Docker Image
+# NXH RabbitMQ - Custom Docker Image
 
 [![Build Status](https://github.com/YOUR_USERNAME/nxh-rabbitmq/workflows/Build%20and%20Push%20Multi-Arch%20Docker%20Image/badge.svg)](https://github.com/YOUR_USERNAME/nxh-rabbitmq/actions)
 [![Docker Pulls](https://img.shields.io/docker/pulls/YOUR_USERNAME/nxh-rabbitmq.svg)](https://hub.docker.com/r/YOUR_USERNAME/nxh-rabbitmq)
@@ -6,7 +6,7 @@
 
 Image Docker RabbitMQ personnalisée et optimisée pour les architectures **ARM64** et **AMD64**, prête pour le déploiement Kubernetes.
 
-## 📋 Table des matières
+## Table des matières
 
 - [Caractéristiques](#-caractéristiques)
 - [Prérequis](#-prérequis)
@@ -19,21 +19,21 @@ Image Docker RabbitMQ personnalisée et optimisée pour les architectures **ARM6
 - [Sécurité](#-sécurité)
 - [Troubleshooting](#-troubleshooting)
 
-## ✨ Caractéristiques
+## Caractéristiques
 
-- 🏗️ **Multi-architecture** : Support natif ARM64 et AMD64
-- 🔐 **Sécurité renforcée** : Credentials personnalisables via variables d'environnement
-- 📊 **Management UI** : Interface web préinstallée (port 15672)
-- 📈 **Monitoring** : Plugin Prometheus activé
-- 🚀 **Optimisé** : Image Alpine Linux pour une taille minimale
-- ♻️ **Production-ready** : Healthchecks configurés
-- 🔌 **Plugins activés** :
+-  **Multi-architecture** : Support natif ARM64 et AMD64
+-  **Sécurité renforcée** : Credentials personnalisables via variables d'environnement
+-  **Management UI** : Interface web préinstallée (port 15672)
+-  **Monitoring** : Plugin Prometheus activé
+-  **Optimisé** : Image Alpine Linux pour une taille minimale
+-  **Production-ready** : Healthchecks configurés
+-  **Plugins activés** :
   - `rabbitmq_management`
   - `rabbitmq_prometheus`
   - `rabbitmq_shovel`
   - `rabbitmq_shovel_management`
 
-## 🔧 Prérequis
+## Prérequis
 
 ### Pour l'utilisation
 - Docker 20.10+
@@ -44,7 +44,7 @@ Image Docker RabbitMQ personnalisée et optimisée pour les architectures **ARM6
 - Git
 - Compte DockerHub (pour la CI/CD)
 
-## 🚀 Installation rapide
+## Installation rapide
 
 ### Avec Docker Hub (recommandé)
 
@@ -71,7 +71,7 @@ Accédez à l'interface web : **http://localhost:15672**
 - Username: `nxh_admin`
 - Password: `nxh_secure_password_2024`
 
-## ⚙️ Configuration
+## Configuration
 
 ### Variables d'environnement NXH
 
@@ -114,7 +114,7 @@ docker run -d \
   YOUR_USERNAME/nxh-rabbitmq:latest
 ```
 
-## 💻 Utilisation locale
+## Utilisation locale
 
 ### Test rapide
 
@@ -146,7 +146,7 @@ docker-compose up -d
 docker-compose down -v
 ```
 
-## 🏗️ Build manuel
+## Build manuel
 
 ### Build simple (architecture locale)
 
@@ -202,7 +202,7 @@ docker buildx build \
 docker buildx imagetools inspect YOUR_USERNAME/nxh-rabbitmq:latest
 ```
 
-## 🤖 CI/CD GitHub Actions
+## CI/CD GitHub Actions
 
 ### Configuration des secrets GitHub
 
@@ -225,10 +225,10 @@ docker buildx imagetools inspect YOUR_USERNAME/nxh-rabbitmq:latest
 ### Déclenchement automatique
 
 Le workflow se déclenche automatiquement sur :
-- ✅ Push sur `main` ou `develop`
-- ✅ Création de tag `v*` (ex: v1.0.0)
-- ✅ Pull Request vers `main` ou `develop`
-- ✅ Déclenchement manuel (workflow_dispatch)
+- Push sur `main` ou `develop`
+- Création de tag `v*` (ex: v1.0.0)
+- Pull Request vers `main` ou `develop`
+- Déclenchement manuel (workflow_dispatch)
 
 ### Tags générés automatiquement
 
@@ -249,7 +249,7 @@ docker pull YOUR_USERNAME/nxh-rabbitmq:latest
 docker inspect YOUR_USERNAME/nxh-rabbitmq:latest | grep Architecture
 ```
 
-## ☸️ Déploiement Kubernetes
+## Déploiement Kubernetes
 
 ### Déploiement simple
 
@@ -342,9 +342,9 @@ kubectl get pods -l app=nxh-rabbitmq
 kubectl logs -f deployment/nxh-rabbitmq
 ```
 
-## 🔒 Sécurité
+## Sécurité
 
-### ⚠️ Recommandations importantes
+### Recommandations importantes
 
 1. **Changez TOUJOURS les credentials par défaut en production**
 2. **Utilisez des secrets Kubernetes** pour stocker les credentials
@@ -364,7 +364,7 @@ kubectl create secret generic rabbitmq-secret \
   --from-literal=password=$(openssl rand -base64 32)
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Le container ne démarre pas
 
@@ -403,20 +403,18 @@ docker buildx create --name multiarch --use
 docker buildx inspect --bootstrap
 ```
 
-## 📚 Resources
+## Resources
 
 - [Documentation officielle RabbitMQ](https://www.rabbitmq.com/documentation.html)
 - [Docker Buildx](https://docs.docker.com/buildx/working-with-buildx/)
 - [GitHub Actions](https://docs.github.com/en/actions)
 
-## 📄 License
+## License
 
 MIT License - voir le fichier [LICENSE](LICENSE)
 
-## 🤝 Contribution
+## Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
 
 ---
-
-**Maintenu par l'équipe DevOps NXH** 🚀

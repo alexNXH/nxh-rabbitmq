@@ -7,7 +7,7 @@ FROM rabbitmq:3.13-management-alpine AS base
 # Metadata
 LABEL maintainer="NXH AdminSys Team"
 LABEL description="Custom RabbitMQ service with advanced configuration"
-LABEL version="1.1.0"
+LABEL version="1.0.7"
 
 # Variables d'environnement - Configuration principale
 ENV NXH_RABBITMQ_HOST=localhost
@@ -37,6 +37,9 @@ RUN rabbitmq-plugins enable --offline \
     rabbitmq_prometheus \
     rabbitmq_shovel \
     rabbitmq_shovel_management
+
+# Installer curl et python3 pour le script d'initialisation
+RUN apk add --no-cache curl python3
 
 # Copier le script d'initialisation
 COPY docker-entrypoint-init.sh /usr/local/bin/

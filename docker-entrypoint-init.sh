@@ -18,78 +18,121 @@ echo "  - VHost: ${NXH_RABBITMQ_VHOST}"
 echo "  - Default Queue: ${NXH_RABBITMQ_QUEUE}"
 echo "=================================================="
 
-# Créer le fichier de définitions pour l'initialisation automatique
-cat > /etc/rabbitmq/definitions.json <<EOF
-{
-  "rabbit_version": "3.13.7",
-  "rabbitmq_version": "3.13.7",
-  "product_name": "RabbitMQ",
-  "product_version": "3.13.7",
-  "users": [
-    {
-      "name": "${NXH_RABBITMQ_USER}",
-      "password_hash": "",
-      "hashing_algorithm": "rabbit_password_hashing_sha256",
-      "tags": ["administrator"],
-      "limits": {}
-    }
-  ],
-  "vhosts": [
-    {
-      "name": "${NXH_RABBITMQ_VHOST}"
-    }
-  ],
-  "permissions": [
-    {
-      "user": "${NXH_RABBITMQ_USER}",
-      "vhost": "${NXH_RABBITMQ_VHOST}",
-      "configure": ".*",
-      "write": ".*",
-      "read": ".*"
-    }
-  ],
-  "queues": [
-    {
-      "name": "${NXH_RABBITMQ_QUEUE}",
-      "vhost": "${NXH_RABBITMQ_VHOST}",
-      "durable": true,
-      "auto_delete": false,
-      "arguments": {}
-    }
-  ],
-  "exchanges": [],
-  "bindings": []
-}
-EOF
-
-# Créer un script post-start pour créer les ressources si besoin
+# Créer un script post-start pour configurer RabbitMQ
 cat > /tmp/post-start.sh <<'POSTSTART'
 #!/bin/bash
+set -e
+
 # Attendre que RabbitMQ soit complètement démarré
-sleep 15
+echo "Waiting for RabbitMQ to start..."
+sleep 20
 
-# Créer le vhost si différent de /
-if [ "${NXH_RABBITMQ_VHOST}" != "/" ]; then
-  echo "Creating vhost: ${NXH_RABBITMQ_VHOST}"
-  rabbitmqctl add_vhost "${NXH_RABBITMQ_VHOST}" 2>/dev/null || true
-  rabbitmqctl set_permissions -p "${NXH_RABBITMQ_VHOST}" "${NXH_RABBITMQ_USER}" ".*" ".*" ".*" 2>/dev/null || true
+# Fonction pour attendre que RabbitMQ soit prêt
+wait_for_rabbitmq() {
+    for i in {1..30}; do
+        if rabbitmqctl status >/dev/null 2>&1; then
+            echo "RabbitMQ is ready!"
+            return 0
+        fi
+        echo "Waiting for RabbitMQ... ($i/30)"
+        sleep 2
+    done
+    echo "RabbitMQ failed to start"
+    return 1
+}
+
+wait_for_rabbitmq
+
+echo "Starting post-configuration..."
+
+# 1. Créer l'utilisateur principal si différent de celui par défaut
+if [ "${NXH_RABBITMQ_USER}" != "${RABBITMQ_DEFAULT_USER}" ]; then
+    echo "Creating user: ${NXH_RABBITMQ_USER}"
+    rabbitmqctl add_user "${NXH_RABBITMQ_USER}" "${NXH_RABBITMQ_PASSWORD}" 2>/dev/null || \
+    rabbitmqctl change_password "${NXH_RABBITMQ_USER}" "${NXH_RABBITMQ_PASSWORD}"
+    
+    rabbitmqctl set_user_tags "${NXH_RABBITMQ_USER}" administrator
+    echo "User ${NXH_RABBITMQ_USER} created/updated"
 fi
 
-# Créer la queue par défaut
+# 2. Créer l'utilisateur management si différent
+if [ -n "${NXH_RABBITMQ_MGMT_USER}" ] && [ "${NXH_RABBITMQ_MGMT_USER}" != "${NXH_RABBITMQ_USER}" ]; then
+    echo "Creating management user: ${NXH_RABBITMQ_MGMT_USER}"
+    rabbitmqctl add_user "${NXH_RABBITMQ_MGMT_USER}" "${NXH_RABBITMQ_MGMT_PASSWORD}" 2>/dev/null || \
+    rabbitmqctl change_password "${NXH_RABBITMQ_MGMT_USER}" "${NXH_RABBITMQ_MGMT_PASSWORD}"
+    
+    rabbitmqctl set_user_tags "${NXH_RABBITMQ_MGMT_USER}" administrator management
+    echo "Management user ${NXH_RABBITMQ_MGMT_USER} created/updated"
+fi
+
+# 3. Créer le vhost si différent de /
+if [ -n "${NXH_RABBITMQ_VHOST}" ] && [ "${NXH_RABBITMQ_VHOST}" != "/" ]; then
+    echo "Creating vhost: ${NXH_RABBITMQ_VHOST}"
+    rabbitmqctl add_vhost "${NXH_RABBITMQ_VHOST}" 2>/dev/null || true
+    echo "VHost ${NXH_RABBITMQ_VHOST} created"
+    
+    # Donner les permissions à l'utilisateur principal sur le nouveau vhost
+    echo "Setting permissions for ${NXH_RABBITMQ_USER} on ${NXH_RABBITMQ_VHOST}"
+    rabbitmqctl set_permissions -p "${NXH_RABBITMQ_VHOST}" "${NXH_RABBITMQ_USER}" ".*" ".*" ".*"
+    
+    # Donner les permissions à l'utilisateur management si différent
+    if [ -n "${NXH_RABBITMQ_MGMT_USER}" ] && [ "${NXH_RABBITMQ_MGMT_USER}" != "${NXH_RABBITMQ_USER}" ]; then
+        rabbitmqctl set_permissions -p "${NXH_RABBITMQ_VHOST}" "${NXH_RABBITMQ_MGMT_USER}" ".*" ".*" ".*"
+    fi
+    
+    echo "Permissions set on vhost ${NXH_RABBITMQ_VHOST}"
+fi
+
+# S'assurer que les utilisateurs ont les permissions sur le vhost par défaut /
+rabbitmqctl set_permissions -p "/" "${NXH_RABBITMQ_USER}" ".*" ".*" ".*" 2>/dev/null || true
+if [ -n "${NXH_RABBITMQ_MGMT_USER}" ] && [ "${NXH_RABBITMQ_MGMT_USER}" != "${NXH_RABBITMQ_USER}" ]; then
+    rabbitmqctl set_permissions -p "/" "${NXH_RABBITMQ_MGMT_USER}" ".*" ".*" ".*" 2>/dev/null || true
+fi
+
+# 4. Créer la queue par défaut si spécifiée
 if [ -n "${NXH_RABBITMQ_QUEUE}" ]; then
-  echo "Creating default queue: ${NXH_RABBITMQ_QUEUE}"
-  
-  # Utiliser l'API REST pour créer la queue
-  sleep 5
-  curl -u "${NXH_RABBITMQ_USER}:${NXH_RABBITMQ_PASSWORD}" \
-    -X PUT \
-    -H "Content-Type: application/json" \
-    -d '{"durable":true,"auto_delete":false}' \
-    "http://localhost:15672/api/queues/${NXH_RABBITMQ_VHOST//\//%2F}/${NXH_RABBITMQ_QUEUE}" \
-    2>/dev/null || true
+    echo "Creating default queue: ${NXH_RABBITMQ_QUEUE}"
+    
+    # Déterminer le vhost à utiliser
+    VHOST_PARAM="${NXH_RABBITMQ_VHOST:-/}"
+    VHOST_ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${VHOST_PARAM}', safe=''))")
+    
+    # Attendre un peu pour que l'API Management soit disponible
+    sleep 5
+    
+    # Créer la queue via l'API REST
+    for i in {1..10}; do
+        if curl -f -u "${NXH_RABBITMQ_USER}:${NXH_RABBITMQ_PASSWORD}" \
+            -X PUT \
+            -H "Content-Type: application/json" \
+            -d '{"durable":true,"auto_delete":false,"arguments":{}}' \
+            "http://localhost:15672/api/queues/${VHOST_ENCODED}/${NXH_RABBITMQ_QUEUE}" 2>/dev/null; then
+            echo "Queue ${NXH_RABBITMQ_QUEUE} created on vhost ${VHOST_PARAM}"
+            break
+        else
+            echo "Retrying queue creation... ($i/10)"
+            sleep 3
+        fi
+    done
 fi
 
-echo "Post-start configuration completed"
+echo ""
+echo "=================================================="
+echo "Post-start configuration completed!"
+echo "=================================================="
+echo ""
+echo "Configuration Summary:"
+echo "  - Default Admin: ${RABBITMQ_DEFAULT_USER}"
+echo "  - Main User: ${NXH_RABBITMQ_USER}"
+echo "  - Management User: ${NXH_RABBITMQ_MGMT_USER:-${NXH_RABBITMQ_USER}}"
+echo "  - VHost: ${NXH_RABBITMQ_VHOST:-/}"
+echo "  - Queue: ${NXH_RABBITMQ_QUEUE:-none}"
+echo ""
+echo "Access URLs:"
+echo "  - Management UI: http://${NXH_RABBITMQ_HOST:-localhost}:${NXH_RABBITMQ_API_PORT}"
+echo "  - AMQP: amqp://${NXH_RABBITMQ_USER}:***@${NXH_RABBITMQ_HOST:-localhost}:${NXH_RABBITMQ_PORT}${NXH_RABBITMQ_VHOST:-/}"
+echo ""
+echo "=================================================="
 POSTSTART
 
 chmod +x /tmp/post-start.sh
