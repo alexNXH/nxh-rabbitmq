@@ -23,21 +23,24 @@ cat > /tmp/post-start.sh <<'POSTSTART'
 #!/bin/bash
 set -e
 
-# Attendre que RabbitMQ soit complètement démarré
-echo "Waiting for RabbitMQ to start..."
-sleep 20
+# Attendre moins longtemps initialement
+echo "Giving RabbitMQ time to initialize..."
+sleep 30
 
 # Fonction pour attendre que RabbitMQ soit prêt
 wait_for_rabbitmq() {
-    for i in {1..30}; do
-        if rabbitmqctl status >/dev/null 2>&1; then
+    echo "Waiting for RabbitMQ to be fully ready..."
+    for i in {1..60}; do
+        # Vérifier que RabbitMQ répond ET que le Management UI est accessible
+        if rabbitmqctl status >/dev/null 2>&1 && \
+           curl -s http://localhost:15672 >/dev/null 2>&1; then
             echo "RabbitMQ is ready!"
             return 0
         fi
-        echo "Waiting for RabbitMQ... ($i/30)"
-        sleep 2
+        echo "Waiting for RabbitMQ and Management UI... ($i/60)"
+        sleep 3
     done
-    echo "RabbitMQ failed to start"
+    echo "RabbitMQ failed to start completely"
     return 1
 }
 
@@ -79,7 +82,7 @@ if [ -n "${NXH_RABBITMQ_VHOST}" ] && [ "${NXH_RABBITMQ_VHOST}" != "/" ]; then
     if [ -n "${NXH_RABBITMQ_MGMT_USER}" ] && [ "${NXH_RABBITMQ_MGMT_USER}" != "${NXH_RABBITMQ_USER}" ]; then
         rabbitmqctl set_permissions -p "${NXH_RABBITMQ_VHOST}" "${NXH_RABBITMQ_MGMT_USER}" ".*" ".*" ".*"
     fi
-    
+
     echo "Permissions set on vhost ${NXH_RABBITMQ_VHOST}"
 fi
 
@@ -92,28 +95,16 @@ fi
 # 4. Créer la queue par défaut si spécifiée
 if [ -n "${NXH_RABBITMQ_QUEUE}" ]; then
     echo "Creating default queue: ${NXH_RABBITMQ_QUEUE}"
-    
+
     # Déterminer le vhost à utiliser
     VHOST_PARAM="${NXH_RABBITMQ_VHOST:-/}"
-    VHOST_ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${VHOST_PARAM}', safe=''))")
     
-    # Attendre un peu pour que l'API Management soit disponible
-    sleep 5
-    
-    # Créer la queue via l'API REST
-    for i in {1..10}; do
-        if curl -f -u "${NXH_RABBITMQ_USER}:${NXH_RABBITMQ_PASSWORD}" \
-            -X PUT \
-            -H "Content-Type: application/json" \
-            -d '{"durable":true,"auto_delete":false,"arguments":{}}' \
-            "http://localhost:15672/api/queues/${VHOST_ENCODED}/${NXH_RABBITMQ_QUEUE}" 2>/dev/null; then
-            echo "Queue ${NXH_RABBITMQ_QUEUE} created on vhost ${VHOST_PARAM}"
-            break
-        else
-            echo "Retrying queue creation... ($i/10)"
-            sleep 3
-        fi
-    done
+    # Créer la queue avec rabbitmqadmin
+    rabbitmqadmin -u "${NXH_RABBITMQ_USER}" -p "${NXH_RABBITMQ_PASSWORD}" \
+        -V "${VHOST_PARAM}" \
+        declare queue name="${NXH_RABBITMQ_QUEUE}" durable=true auto_delete=false \
+        2>/dev/null && echo "Queue ${NXH_RABBITMQ_QUEUE} created on vhost ${VHOST_PARAM}" || \
+        echo "Queue might already exist or will be created on first use"
 fi
 
 echo ""
